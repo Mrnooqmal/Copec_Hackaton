@@ -79,16 +79,16 @@ const searchAddress = async (query: string): Promise<Location[]> => {
 
 // Popular EV models in Chile with real range specs
 const VEHICLE_MODELS = [
-    { id: 'tesla_model_3', name: 'Tesla Model 3 Long Range', range: 547, image: '🚗' },
-    { id: 'tesla_model_y', name: 'Tesla Model Y', range: 455, image: '🚙' },
-    { id: 'byd_atto3', name: 'BYD Atto 3', range: 420, image: '🚙' },
-    { id: 'byd_dolphin', name: 'BYD Dolphin', range: 340, image: '🐬' },
-    { id: 'byd_seal', name: 'BYD Seal', range: 570, image: '🦭' },
-    { id: 'nissan_leaf', name: 'Nissan Leaf e+', range: 363, image: '🍃' },
-    { id: 'vw_id4', name: 'Volkswagen ID.4', range: 402, image: '🚙' },
-    { id: 'hyundai_kona', name: 'Hyundai Kona Electric', range: 380, image: '⚡' },
-    { id: 'kia_ev6', name: 'Kia EV6', range: 528, image: '⚡' },
-    { id: 'custom', name: 'Otro vehículo', range: 350, image: '🔋' }
+    { id: 'tesla_model_3', name: 'Tesla Model 3 Long Range', range: 547 },
+    { id: 'tesla_model_y', name: 'Tesla Model Y', range: 455 },
+    { id: 'byd_atto3', name: 'BYD Atto 3', range: 420 },
+    { id: 'byd_dolphin', name: 'BYD Dolphin', range: 340 },
+    { id: 'byd_seal', name: 'BYD Seal', range: 570 },
+    { id: 'nissan_leaf', name: 'Nissan Leaf e+', range: 363 },
+    { id: 'vw_id4', name: 'Volkswagen ID.4', range: 402 },
+    { id: 'hyundai_kona', name: 'Hyundai Kona Electric', range: 380 },
+    { id: 'kia_ev6', name: 'Kia EV6', range: 528 },
+    { id: 'custom', name: 'Otro vehículo', range: 350 }
 ];
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -139,7 +139,7 @@ export default function TripPlanner({ onClose, userLocation, onShowRoute }: Trip
                 setOriginResults([]);
                 setShowOriginResults(false);
             }
-        }, 400);
+        }, 200);
         return () => clearTimeout(timer);
     }, [originSearch]);
 
@@ -156,7 +156,7 @@ export default function TripPlanner({ onClose, userLocation, onShowRoute }: Trip
                 setDestResults([]);
                 setShowDestResults(false);
             }
-        }, 400);
+        }, 200);
         return () => clearTimeout(timer);
     }, [destSearch]);
 
@@ -385,7 +385,7 @@ export default function TripPlanner({ onClose, userLocation, onShowRoute }: Trip
                         >
                             {VEHICLE_MODELS.map(v => (
                                 <option key={v.id} value={v.id}>
-                                    {v.image} {v.name} ({v.range} km)
+                                    {v.name} ({v.range} km)
                                 </option>
                             ))}
                         </select>
@@ -430,7 +430,7 @@ export default function TripPlanner({ onClose, userLocation, onShowRoute }: Trip
                         </div>
 
                         <p className="range-explanation">
-                            💡 La <em>autonomía</em> es la distancia máxima que tu vehículo puede recorrer con la batería llena.
+                            <strong>Tip:</strong> La <em>autonomía</em> es la distancia máxima que tu vehículo puede recorrer con la batería llena.
                             Con tu {selectedVehicle.name} al 100% podrías hacer {vehicleRange} km.
                         </p>
                     </div>
