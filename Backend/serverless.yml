@@ -1,0 +1,756 @@
+service: hackathon-copec
+
+plugins:
+  - serverless-prune-plugin
+  - serverless-offline
+
+custom:
+  prune:
+    automatic: true
+    number: 2
+  serverless-offline:
+    httpPort: 3001
+    lambdaPort: 3002
+  bucketName: hackatonbackend-documents-v245-${self:provider.stage}
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    WORKERS_TABLE: ${self:service}-workers-${self:provider.stage}
+    SIGNATURE_REQUESTS_TABLE: ${self:service}-signature-requests-${self:provider.stage}
+    SIGNATURES_TABLE: ${self:service}-signatures-${self:provider.stage}
+    USERS_TABLE: ${self:service}-users-${self:provider.stage}
+    SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}
+    SURVEYS_TABLE: ${self:service}-surveys-${self:provider.stage}
+    SES_SENDER_EMAIL: 'benjasncz@gmail.com'
+    INCIDENTS_TABLE: ${self:service}-incidents-${self:provider.stage}
+    INCIDENT_EVIDENCE_BUCKET: hackatonbackend-incident-evidence-${self:provider.stage}-${aws:accountId}
+    INCIDENT_NOTIFICATION_TOPIC: ${self:service}-incident-notifications-${self:provider.stage}
+    DOCUMENTS_BUCKET: ${self:custom.bucketName}
+    DOCUMENTS_TABLE: ${self:service}-documents-${self:provider.stage}
+    ACTIVITIES_TABLE: ${self:service}-activities-${self:provider.stage}
+    INBOX_TABLE: ${self:service}-inbox-${self:provider.stage}
+    IS_OFFLINE: ${env:IS_OFFLINE, 'false'}
+    # NEW: Feature flag for unified PersonaService (User/Worker sync)
+    USE_PERSONA_SERVICE: 'true'
+    # NEW: Feature flag for unified CumplimientoService (Signatures management)
+    USE_CUMPLIMIENTO_SERVICE: 'true'
+    GEMINI_API_KEY: ${env:GEMINI_API_KEY}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - !GetAtt WorkersTable.Arn
+            - !GetAtt SignatureRequestsTable.Arn
+            - !GetAtt SignaturesTable.Arn
+            - !Sub ${SignaturesTable.Arn}/index/*
+            - !GetAtt UsersTable.Arn
+            - !GetAtt SessionsTable.Arn
+            - !GetAtt SurveysTable.Arn
+            - !GetAtt IncidentsTable.Arn
+            - !GetAtt InboxTable.Arn
+            - !Sub ${InboxTable.Arn}/index/*
+            - !GetAtt ActivitiesTable.Arn
+            - !GetAtt DocumentsTable.Arn
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - ses:SendRawEmail
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource:
+            - !Sub '${IncidentEvidenceBucket.Arn}/*'
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource:
+            - !Sub 'arn:aws:s3:::${self:custom.bucketName}/*'
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource:
+            - !Ref IncidentNotificationTopic
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeModel
+            - bedrock:InvokeModelWithResponseStream
+          Resource:
+            - "arn:aws:bedrock:*::foundation-model/anthropic.*"
+            - "arn:aws:bedrock:*::foundation-model/amazon.*"
+        - Effect: Allow
+          Action:
+            - aws-marketplace:ViewSubscriptions
+            - aws-marketplace:Subscribe
+            - aws-marketplace:Unsubscribe
+          Resource: "*"
+
+package:
+  individually: false
+  excludeDevDependencies: true
+  patterns:
+    - '!node_modules/.prisma/**'
+    - '!node_modules/@prisma/**'
+    - '!node_modules/.bin/**'
+    - '!tests/**'
+    - '!**/__tests__/**'
+
+functions:
+  # Auth (Autenticación)
+  authLogin:
+    handler: handlers/auth.login
+    events:
+      - httpApi:
+          path: /auth/login
+          method: POST
+
+  authChangePassword:
+    handler: handlers/auth.changePassword
+    events:
+      - httpApi:
+          path: /auth/change-password
+          method: POST
+
+  authLogout:
+    handler: handlers/auth.logout
+    events:
+      - httpApi:
+          path: /auth/logout
+          method: POST
+
+  authMe:
+    handler: handlers/auth.me
+    events:
+      - httpApi:
+          path: /auth/me
+          method: GET
+
+  authValidateToken:
+    handler: handlers/auth.validateToken
+    events:
+      - httpApi:
+          path: /auth/validate-token
+          method: POST
+
+  # Users (Usuarios)
+  usersModule:
+    handler: handlers/users-module/handler.usersHandler
+    events:
+      - httpApi:
+          path: /users
+          method: any
+      - httpApi:
+          path: /users/{proxy+}
+          method: any
+
+  # Workers (Trabajadores/Enrolamiento)
+  workersModule:
+    handler: handlers/workers-module/handler.workersHandler
+    events:
+      - httpApi:
+          path: /workers
+          method: any
+      - httpApi:
+          path: /workers/{proxy+}
+          method: any
+
+  # ========================================
+  # SIGNATURE REQUESTS (Solicitudes de Firma)
+  # ========================================
+  createSignatureRequest:
+    handler: handlers/signature-requests.create
+    events:
+      - httpApi:
+          path: /signature-requests
+          method: POST
+
+  listSignatureRequests:
+    handler: handlers/signature-requests.list
+    events:
+      - httpApi:
+          path: /signature-requests
+          method: GET
+
+  getSignatureRequest:
+    handler: handlers/signature-requests.get
+    events:
+      - httpApi:
+          path: /signature-requests/{id}
+          method: GET
+
+  getPendingByWorker:
+    handler: handlers/signature-requests.getPendingByWorker
+    events:
+      - httpApi:
+          path: /signature-requests/pending/{workerId}
+          method: GET
+
+  getHistoryByWorker:
+    handler: handlers/signature-requests.getHistoryByWorker
+    events:
+      - httpApi:
+          path: /signature-requests/history/{workerId}
+          method: GET
+
+  cancelSignatureRequest:
+    handler: handlers/signature-requests.cancel
+    events:
+      - httpApi:
+          path: /signature-requests/{id}/cancel
+          method: POST
+
+  getSignatureRequestStats:
+    handler: handlers/signature-requests.getStats
+    events:
+      - httpApi:
+          path: /signature-requests/stats
+          method: GET
+
+  processOfflineBatch:
+    handler: handlers/signature-requests.processOfflineBatch
+    events:
+      - httpApi:
+          path: /signature-requests/offline-batch
+          method: POST
+
+  # Activities (Actividades)
+  listActivities:
+    handler: handlers/activities.list
+    events:
+      - httpApi:
+          path: /activities
+          method: GET
+
+  createActivity:
+    handler: handlers/activities.create
+    events:
+      - httpApi:
+          path: /activities
+          method: POST
+
+  getActivity:
+    handler: handlers/activities.get
+    events:
+      - httpApi:
+          path: /activities/{id}
+          method: GET
+
+  registerActivityAttendance:
+    handler: handlers/activities.registerAttendance
+    events:
+      - httpApi:
+          path: /activities/{id}/attendance
+          method: POST
+
+  getActivityStats:
+    handler: handlers/activities.getStats
+    events:
+      - httpApi:
+          path: /activities/stats
+          method: GET
+
+  # Documents (Documentos)
+  listDocuments:
+    handler: handlers/documents.list
+    events:
+      - httpApi:
+          path: /documents
+          method: GET
+
+  createDocument:
+    handler: handlers/documents.create
+    events:
+      - httpApi:
+          path: /documents
+          method: POST
+
+  getDocument:
+    handler: handlers/documents.get
+    events:
+      - httpApi:
+          path: /documents/{id}
+          method: GET
+
+  assignDocument:
+    handler: handlers/documents.assign
+    events:
+      - httpApi:
+          path: /documents/{id}/assign
+          method: POST
+
+  signDocument:
+    handler: handlers/documents.sign
+    events:
+      - httpApi:
+          path: /documents/{id}/sign
+          method: POST
+
+  signBulkDocuments:
+    handler: handlers/documents.signBulk
+    events:
+      - httpApi:
+          path: /documents/{id}/sign-bulk
+          method: POST
+
+  # ========================================
+  # SIGNATURES (Firmas Digitales)
+  # ========================================
+  createSignature:
+    handler: handlers/signatures-new.create
+    events:
+      - httpApi:
+          path: /signatures
+          method: POST
+
+  createEnrollmentSignature:
+    handler: handlers/signatures-new.createEnrollment
+    events:
+      - httpApi:
+          path: /signatures/enroll
+          method: POST
+
+  getSignature:
+    handler: handlers/signatures-new.get
+    events:
+      - httpApi:
+          path: /signatures/{id}
+          method: GET
+
+  getSignaturesByWorker:
+    handler: handlers/signatures-new.getByWorker
+    events:
+      - httpApi:
+          path: /signatures/worker/{workerId}
+          method: GET
+
+  getSignaturesByRequest:
+    handler: handlers/signatures-new.getByRequest
+    events:
+      - httpApi:
+          path: /signatures/request/{requestId}
+          method: GET
+
+  verifySignatureByToken:
+    handler: handlers/signatures-new.verifyByToken
+    events:
+      - httpApi:
+          path: /signatures/verify/{token}
+          method: GET
+
+  disputeSignature:
+    handler: handlers/signatures-new.dispute
+    events:
+      - httpApi:
+          path: /signatures/{id}/dispute
+          method: POST
+
+  resolveSignatureDispute:
+    handler: handlers/signatures-new.resolve
+    events:
+      - httpApi:
+          path: /signatures/{id}/resolve
+          method: PUT
+
+  listSignatureDisputes:
+    handler: handlers/signatures-new.listDisputes
+    events:
+      - httpApi:
+          path: /signatures/disputes
+          method: GET
+
+  # ========================================
+  # UPLOADS (Subida de archivos a S3)
+  # ========================================
+  getUploadUrl:
+    handler: handlers/uploads.getUploadUrl
+    events:
+      - httpApi:
+          path: /uploads/presigned-url
+          method: POST
+
+  getDownloadUrl:
+    handler: handlers/uploads.getDownloadUrl
+    events:
+      - httpApi:
+          path: /uploads/download-url
+          method: POST
+
+  confirmUpload:
+    handler: handlers/uploads.confirmUpload
+    events:
+      - httpApi:
+          path: /uploads/confirm
+          method: POST
+
+  deleteUpload:
+    handler: handlers/uploads.deleteFile
+    events:
+      - httpApi:
+          path: /uploads/{fileKey}
+          method: DELETE
+
+  getBatchDownloadUrls:
+    handler: handlers/uploads.getBatchDownloadUrls
+    events:
+      - httpApi:
+          path: /uploads/batch-download-urls
+          method: POST
+
+  # AI Assistant (Asistente IA)
+  aiChat:
+    handler: handlers/ai-assistant.chat
+    timeout: 30
+    events:
+      - httpApi:
+          path: /ai/chat
+          method: POST
+
+  aiRiskMatrix:
+    handler: handlers/ai-assistant.generateRiskMatrix
+    timeout: 30
+    events:
+      - httpApi:
+          path: /ai/risk-matrix
+          method: POST
+
+  aiPreventionPlan:
+    handler: handlers/ai-assistant.generatePreventionPlan
+    timeout: 30
+    events:
+      - httpApi:
+          path: /ai/prevention-plan
+          method: POST
+
+  aiDailyTalk:
+    handler: handlers/ai-assistant.generateDailyTalk
+    timeout: 30
+    events:
+      - httpApi:
+          path: /ai/daily-talk
+          method: POST
+
+  aiMIPER:
+    handler: handlers/ai-assistant.generateMIPER
+    timeout: 30
+    events:
+      - httpApi:
+          path: /ai/miper
+          method: POST
+
+  aiAnalyzeIncident:
+    handler: handlers/ai-assistant.analyzeIncident
+    timeout: 30
+    events:
+      - httpApi:
+          path: /ai/analyze-incident
+          method: POST
+
+  aiExtractIncident:
+    handler: handlers/ai-assistant.extractIncident
+    timeout: 30
+    events:
+      - httpApi:
+          path: /ai/extract-incident
+          method: POST
+
+  aiTranscribeAudio:
+    handler: handlers/ai-assistant.transcribeAudio
+    timeout: 60
+    events:
+      - httpApi:
+          path: /ai/transcribe
+          method: POST
+
+  # Surveys (Encuestas)
+  createSurvey:
+    handler: handlers/surveys.create
+    events:
+      - httpApi:
+          path: /surveys
+          method: POST
+
+  listSurveys:
+    handler: handlers/surveys.list
+    events:
+      - httpApi:
+          path: /surveys
+          method: GET
+
+  getSurvey:
+    handler: handlers/surveys.get
+    events:
+      - httpApi:
+          path: /surveys/{id}
+          method: GET
+
+  updateSurveyResponse:
+    handler: handlers/surveys.updateResponseStatus
+    events:
+      - httpApi:
+          path: /surveys/{id}/responses/{workerId}
+          method: POST
+
+  incidentsModule:
+    handler: handlers/incidents-module/handler.incidentsHandler
+    events:
+      - httpApi:
+          path: /incidents
+          method: any
+      - httpApi:
+          path: /incidents/{proxy+}
+          method: any
+
+  # Notifications
+  sendWelcomeEmail:
+    handler: handlers/notifications.sendWelcome
+    events:
+      - httpApi:
+          path: /test-email
+          method: POST
+
+  inboxModule:
+    handler: handlers/inbox-module/handler.inboxHandler
+    events:
+      - httpApi:
+          path: /inbox
+          method: any
+      - httpApi:
+          path: /inbox/{proxy+}
+          method: any
+
+resources:
+  Resources:
+    # S3 Bucket para documentos
+    DocumentsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+              AllowedOrigins:
+                - '*'
+              MaxAge: 3000
+
+    # Workers Table
+    WorkersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.WORKERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: workerId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: workerId
+            KeyType: HASH
+
+    # Signature Requests Table
+    SignatureRequestsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.SIGNATURE_REQUESTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: requestId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: requestId
+            KeyType: HASH
+
+    # Signatures Table con GSI para requestId
+    SignaturesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.SIGNATURES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: signatureId
+            AttributeType: S
+          - AttributeName: requestId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: signatureId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: requestId-index
+            KeySchema:
+              - AttributeName: requestId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+    # Users Table
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+
+    # Sessions Table
+    SessionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.SESSIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: sessionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: sessionId
+            KeyType: HASH
+
+    SurveysTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.SURVEYS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: surveyId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: surveyId
+            KeyType: HASH
+    IncidentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.INCIDENTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: incidentId
+            AttributeType: S
+          - AttributeName: empresaId
+            AttributeType: S
+          - AttributeName: fecha
+            AttributeType: S
+        KeySchema:
+          - AttributeName: incidentId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: empresaId-fecha-index
+            KeySchema:
+              - AttributeName: empresaId
+                KeyType: HASH
+              - AttributeName: fecha
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    IncidentEvidenceBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.INCIDENT_EVIDENCE_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+              AllowedHeaders:
+                - '*'
+              MaxAge: 3000
+
+    IncidentNotificationTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:provider.environment.INCIDENT_NOTIFICATION_TOPIC}
+        DisplayName: Notificaciones de Incidentes y Accidentes
+
+    # Inbox Messages Table
+    InboxTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.INBOX_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: recipientId
+            AttributeType: S
+          - AttributeName: messageId
+            AttributeType: S
+          - AttributeName: senderId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: recipientId
+            KeyType: HASH
+          - AttributeName: messageId
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: senderId-createdAt-index
+            KeySchema:
+              - AttributeName: senderId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    # Activities Table
+    ActivitiesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.ACTIVITIES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: activityId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: activityId
+            KeyType: HASH
+
+    # Documents Table
+    DocumentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DOCUMENTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: documentId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: documentId
+            KeyType: HASH
