@@ -139,9 +139,10 @@ a svg {
 /* Controls */
 .map-controls {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 12px 24px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 24px;
   background: var(--copec-white);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   overflow-x: auto;
@@ -151,6 +152,7 @@ a svg {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 220px;
 }
 
 .control-group label {
@@ -168,11 +170,11 @@ a svg {
 }
 
 .battery-control input[type="range"] {
-  width: 120px;
-  height: 6px;
+  width: 160px;
+  height: 8px;
   appearance: none;
   -webkit-appearance: none;
-  background: linear-gradient(to right, var(--status-occupied), var(--status-maintenance), var(--status-available));
+  background: linear-gradient(90deg, #dbeafe 0%, var(--copec-primary) 100%);
   border-radius: 3px;
   outline: none;
 }
@@ -203,7 +205,7 @@ a svg {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 12px;
+  padding: 9px 14px;
   border: 1px solid var(--copec-light-gray);
   background: var(--copec-white);
   border-radius: var(--radius-md);
@@ -262,6 +264,11 @@ a svg {
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(0, 0, 0, 0.06);
   overflow: hidden;
+}
+
+/* Desaturate map tiles while keeping greens slightly vivid */
+.leaflet-tile {
+  filter: url(#desaturate-keep-green);
 }
 
 .location-button {
@@ -406,7 +413,7 @@ a svg {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 2500;
+  z-index: 2600;
 }
 
 .chat-header {
@@ -1468,7 +1475,7 @@ a svg {
   position: fixed;
   right: 20px;
   bottom: 20px;
-  z-index: 2000;
+  z-index: 2600;
 }
 
 .ai-chat {
