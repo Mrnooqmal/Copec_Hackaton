@@ -15,7 +15,10 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     IS_OFFLINE: ${env:IS_OFFLINE, 'false'}
-    BEDROCK_MODEL_ID: 'anthropic.claude-3-sonnet-20240229-v1:0'
+    BEDROCK_MODEL_ID: 'anthropic.claude-haiku-4-5-20251001-v1:0'
+    BEDROCK_KB_ID: 'JZOB2W2N57'
+    BEDROCK_BEARER_TOKEN: ${env:AWS_BEARER_TOKEN_BEDROCK, ''}
+    KB_S3_BUCKET: ${self:service}-knowledge-${self:provider.stage}
     STATIONS_TABLE: ${self:service}-stations-${self:provider.stage}
     VENUES_TABLE: ${self:service}-venues-${self:provider.stage}
     USERS_TABLE: ${self:service}-users-${self:provider.stage}
@@ -45,6 +48,20 @@ provider:
           Resource:
             - "arn:aws:bedrock:*::foundation-model/anthropic.*"
             - "arn:aws:bedrock:*::foundation-model/amazon.*"
+        - Effect: Allow
+          Action:
+            - bedrock-agent-runtime:Retrieve
+            - bedrock-agent-runtime:RetrieveAndGenerate
+          Resource:
+            - "arn:aws:bedrock:*:*:knowledge-base/*"
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:ListBucket
+          Resource:
+            - !GetAtt KnowledgeBaseBucket.Arn
+            - !Sub ${KnowledgeBaseBucket.Arn}/*
         - Effect: Allow
           Action:
             - dynamodb:Query
@@ -170,6 +187,53 @@ functions:
           method: POST
 
   # ========================================
+  # AI AGENT (Tool Use with Bedrock)
+  # ========================================
+  evAgent:
+    handler: handlers/ev-agent.chat
+    timeout: 120
+    memorySize: 512
+    events:
+      - httpApi:
+          path: /api/agent
+          method: POST
+
+  evAgentQuick:
+    handler: handlers/ev-agent.quickRecommend
+    timeout: 30
+    events:
+      - httpApi:
+          path: /api/agent/quick
+          method: POST
+
+  # ========================================
+  # KNOWLEDGE BASE (RAG with Bedrock)
+  # ========================================
+  evKnowledgeQuery:
+    handler: handlers/ev-knowledge.query
+    timeout: 30
+    events:
+      - httpApi:
+          path: /api/knowledge/query
+          method: POST
+
+  evKnowledgeTopics:
+    handler: handlers/ev-knowledge.topics
+    timeout: 10
+    events:
+      - httpApi:
+          path: /api/knowledge/topics
+          method: GET
+
+  evKnowledgeSearch:
+    handler: handlers/ev-knowledge.search
+    timeout: 30
+    events:
+      - httpApi:
+          path: /api/knowledge/search
+          method: POST
+
+  # ========================================
   # TRIP PLANNER
   # ========================================
   evPlanTrip:
@@ -291,3 +355,14 @@ resources:
         KeySchema:
           - AttributeName: sessionId
             KeyType: HASH
+
+    # S3 Bucket for Knowledge Base Documents
+    KnowledgeBaseBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.KB_S3_BUCKET}
+        Tags:
+          - Key: Project
+            Value: copec-ev-hackathon
+          - Key: Purpose
+            Value: bedrock-knowledge-base
