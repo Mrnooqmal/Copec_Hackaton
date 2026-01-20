@@ -1,0 +1,192 @@
+{
+    "charging_sessions": [
+        {
+            "station_id": "COPEC_ALAMEDA_001",
+            "charger_id": "CHG_001_A",
+            "hourly_usage": {
+                "00:00": 15,
+                "01:00": 8,
+                "02:00": 5,
+                "03:00": 3,
+                "04:00": 5,
+                "05:00": 12,
+                "06:00": 45,
+                "07:00": 85,
+                "08:00": 92,
+                "09:00": 78,
+                "10:00": 65,
+                "11:00": 58,
+                "12:00": 72,
+                "13:00": 68,
+                "14:00": 55,
+                "15:00": 48,
+                "16:00": 52,
+                "17:00": 78,
+                "18:00": 95,
+                "19:00": 88,
+                "20:00": 72,
+                "21:00": 55,
+                "22:00": 38,
+                "23:00": 25
+            },
+            "avg_session_duration_minutes": 28,
+            "peak_demand_kw": 145,
+            "daily_sessions": 42
+        },
+        {
+            "station_id": "COPEC_PROVIDENCIA_002",
+            "charger_id": "CHG_002_A",
+            "hourly_usage": {
+                "00:00": 10,
+                "01:00": 5,
+                "02:00": 3,
+                "03:00": 2,
+                "04:00": 4,
+                "05:00": 8,
+                "06:00": 35,
+                "07:00": 72,
+                "08:00": 88,
+                "09:00": 82,
+                "10:00": 70,
+                "11:00": 62,
+                "12:00": 68,
+                "13:00": 65,
+                "14:00": 52,
+                "15:00": 45,
+                "16:00": 55,
+                "17:00": 82,
+                "18:00": 90,
+                "19:00": 85,
+                "20:00": 68,
+                "21:00": 48,
+                "22:00": 32,
+                "23:00": 18
+            },
+            "avg_session_duration_minutes": 32,
+            "peak_demand_kw": 148,
+            "daily_sessions": 38
+        },
+        {
+            "station_id": "COPEC_LASCONDES_003",
+            "charger_id": "CHG_003_A",
+            "hourly_usage": {
+                "00:00": 8,
+                "01:00": 4,
+                "02:00": 2,
+                "03:00": 1,
+                "04:00": 3,
+                "05:00": 6,
+                "06:00": 28,
+                "07:00": 68,
+                "08:00": 95,
+                "09:00": 88,
+                "10:00": 75,
+                "11:00": 68,
+                "12:00": 82,
+                "13:00": 78,
+                "14:00": 62,
+                "15:00": 55,
+                "16:00": 65,
+                "17:00": 88,
+                "18:00": 98,
+                "19:00": 92,
+                "20:00": 75,
+                "21:00": 58,
+                "22:00": 42,
+                "23:00": 22
+            },
+            "avg_session_duration_minutes": 25,
+            "peak_demand_kw": 150,
+            "daily_sessions": 52
+        }
+    ],
+    "queue_density": {
+        "COPEC_ALAMEDA_001": {
+            "current_queue": 2,
+            "avg_wait_minutes": 12,
+            "trend": "increasing"
+        },
+        "COPEC_PROVIDENCIA_002": {
+            "current_queue": 0,
+            "avg_wait_minutes": 0,
+            "trend": "stable"
+        },
+        "COPEC_LASCONDES_003": {
+            "current_queue": 3,
+            "avg_wait_minutes": 18,
+            "trend": "decreasing"
+        },
+        "COPEC_NUNOA_004": {
+            "current_queue": 1,
+            "avg_wait_minutes": 8,
+            "trend": "stable"
+        },
+        "COPEC_VITACURA_005": {
+            "current_queue": 0,
+            "avg_wait_minutes": 0,
+            "trend": "stable"
+        },
+        "COPEC_MAIPU_006": {
+            "current_queue": 0,
+            "avg_wait_minutes": 0,
+            "trend": "stable"
+        },
+        "COPEC_LAFL_007": {
+            "current_queue": 4,
+            "avg_wait_minutes": 25,
+            "trend": "increasing"
+        },
+        "COPEC_PENAL_008": {
+            "current_queue": 2,
+            "avg_wait_minutes": 15,
+            "trend": "stable"
+        },
+        "COPEC_SANMIGUEL_009": {
+            "current_queue": 0,
+            "avg_wait_minutes": 0,
+            "trend": "stable"
+        },
+        "COPEC_RECOLETA_010": {
+            "current_queue": 1,
+            "avg_wait_minutes": 10,
+            "trend": "decreasing"
+        },
+        "COPEC_PUENTE_011": {
+            "current_queue": 1,
+            "avg_wait_minutes": 12,
+            "trend": "stable"
+        },
+        "COPEC_HUECH_012": {
+            "current_queue": 0,
+            "avg_wait_minutes": 0,
+            "trend": "stable"
+        }
+    },
+    "real_time_power": {
+        "COPEC_ALAMEDA_001": {
+            "current_load_kw": 142,
+            "max_capacity_kw": 200,
+            "efficiency_percent": 94
+        },
+        "COPEC_PROVIDENCIA_002": {
+            "current_load_kw": 285,
+            "max_capacity_kw": 300,
+            "efficiency_percent": 96
+        },
+        "COPEC_LASCONDES_003": {
+            "current_load_kw": 198,
+            "max_capacity_kw": 350,
+            "efficiency_percent": 95
+        },
+        "COPEC_VITACURA_005": {
+            "current_load_kw": 145,
+            "max_capacity_kw": 350,
+            "efficiency_percent": 97
+        }
+    },
+    "metadata": {
+        "last_sync": "2026-01-20T11:35:00-03:00",
+        "data_source": "mock_simulation",
+        "refresh_interval_seconds": 30
+    }
+}

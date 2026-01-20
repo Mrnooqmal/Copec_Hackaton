@@ -1,0 +1,322 @@
+{
+    "venues": {
+        "COPEC_ALAMEDA_001": {
+            "station_id": "COPEC_ALAMEDA_001",
+            "venue_type": "copec_full_service",
+            "services": {
+                "pronto_copec": {
+                    "available": true,
+                    "hours": "24/7",
+                    "products": [
+                        "snacks",
+                        "bebidas",
+                        "café",
+                        "comida rápida"
+                    ],
+                    "promotions": [
+                        {
+                            "name": "Café + Carga",
+                            "discount_percent": 15,
+                            "valid_until": "2026-02-28"
+                        }
+                    ]
+                },
+                "street_burger": {
+                    "available": false
+                },
+                "restrooms": {
+                    "available": true,
+                    "accessible": true
+                },
+                "wifi": {
+                    "available": true,
+                    "speed_mbps": 50,
+                    "password_required": false
+                },
+                "parking": {
+                    "available": true,
+                    "spots": 8,
+                    "ev_dedicated": 4
+                }
+            },
+            "contact": {
+                "phone": "+56 2 2200 0001",
+                "whatsapp": "+56 9 8765 4321"
+            },
+            "ratings": {
+                "overall": 4.3,
+                "cleanliness": 4.5,
+                "service": 4.2,
+                "speed": 4.1,
+                "total_reviews": 128
+            }
+        },
+        "COPEC_PROVIDENCIA_002": {
+            "station_id": "COPEC_PROVIDENCIA_002",
+            "venue_type": "copec_premium",
+            "services": {
+                "pronto_copec": {
+                    "available": true,
+                    "hours": "06:00-00:00",
+                    "products": [
+                        "snacks premium",
+                        "café specialty",
+                        "sandwiches gourmet"
+                    ],
+                    "promotions": []
+                },
+                "street_burger": {
+                    "available": true,
+                    "hours": "11:00-23:00",
+                    "menu_highlights": [
+                        "Classic Burger",
+                        "Veggie Burger",
+                        "Papas Street"
+                    ]
+                },
+                "restrooms": {
+                    "available": true,
+                    "accessible": true
+                },
+                "wifi": {
+                    "available": true,
+                    "speed_mbps": 100,
+                    "password_required": false
+                },
+                "lounge": {
+                    "available": true,
+                    "capacity": 12,
+                    "amenities": [
+                        "TV",
+                        "trabajo remoto",
+                        "cargadores celular"
+                    ]
+                },
+                "parking": {
+                    "available": true,
+                    "spots": 15,
+                    "ev_dedicated": 8
+                }
+            },
+            "contact": {
+                "phone": "+56 2 2200 0002"
+            },
+            "ratings": {
+                "overall": 4.7,
+                "cleanliness": 4.8,
+                "service": 4.6,
+                "speed": 4.5,
+                "total_reviews": 256
+            }
+        },
+        "COPEC_LASCONDES_003": {
+            "station_id": "COPEC_LASCONDES_003",
+            "venue_type": "copec_premium",
+            "services": {
+                "pronto_copec": {
+                    "available": true,
+                    "hours": "24/7",
+                    "products": [
+                        "café premium",
+                        "snacks importados",
+                        "comida saludable"
+                    ]
+                },
+                "street_burger": {
+                    "available": true,
+                    "hours": "12:00-22:00",
+                    "menu_highlights": [
+                        "Double Smash",
+                        "Chicken Burger",
+                        "Milkshakes"
+                    ]
+                },
+                "restrooms": {
+                    "available": true,
+                    "accessible": true
+                },
+                "wifi": {
+                    "available": true,
+                    "speed_mbps": 150,
+                    "password_required": false
+                },
+                "lounge": {
+                    "available": true,
+                    "capacity": 8
+                },
+                "parking": {
+                    "available": true,
+                    "spots": 20,
+                    "ev_dedicated": 10,
+                    "valet": true
+                }
+            },
+            "ratings": {
+                "overall": 4.8,
+                "cleanliness": 4.9,
+                "service": 4.7,
+                "speed": 4.6,
+                "total_reviews": 312
+            }
+        },
+        "COPEC_VITACURA_005": {
+            "station_id": "COPEC_VITACURA_005",
+            "venue_type": "copec_flagship",
+            "services": {
+                "pronto_copec": {
+                    "available": true,
+                    "hours": "24/7",
+                    "products": [
+                        "café barista",
+                        "pastelería artesanal",
+                        "productos orgánicos"
+                    ],
+                    "promotions": [
+                        {
+                            "name": "Happy Hour EV",
+                            "discount_percent": 20,
+                            "hours": "14:00-17:00"
+                        }
+                    ]
+                },
+                "street_burger": {
+                    "available": true,
+                    "hours": "11:00-00:00",
+                    "menu_highlights": [
+                        "Wagyu Burger",
+                        "Truffle Fries",
+                        "Craft Beer"
+                    ]
+                },
+                "restrooms": {
+                    "available": true,
+                    "accessible": true,
+                    "shower": true
+                },
+                "wifi": {
+                    "available": true,
+                    "speed_mbps": 200,
+                    "password_required": false
+                },
+                "lounge": {
+                    "available": true,
+                    "capacity": 20,
+                    "amenities": [
+                        "cowork",
+                        "salas reunión",
+                        "café gratis"
+                    ]
+                },
+                "parking": {
+                    "available": true,
+                    "spots": 30,
+                    "ev_dedicated": 15,
+                    "valet": true
+                }
+            },
+            "ratings": {
+                "overall": 4.9,
+                "cleanliness": 5.0,
+                "service": 4.9,
+                "speed": 4.8,
+                "total_reviews": 489
+            }
+        },
+        "COPEC_MAIPU_006": {
+            "station_id": "COPEC_MAIPU_006",
+            "venue_type": "copec_standard",
+            "services": {
+                "pronto_copec": {
+                    "available": true,
+                    "hours": "06:00-23:00",
+                    "products": [
+                        "snacks",
+                        "bebidas",
+                        "café"
+                    ]
+                },
+                "street_burger": {
+                    "available": false
+                },
+                "restrooms": {
+                    "available": true,
+                    "accessible": false
+                },
+                "wifi": {
+                    "available": true,
+                    "speed_mbps": 30,
+                    "password_required": true
+                },
+                "parking": {
+                    "available": true,
+                    "spots": 10,
+                    "ev_dedicated": 4
+                }
+            },
+            "ratings": {
+                "overall": 4.0,
+                "cleanliness": 4.1,
+                "service": 3.9,
+                "speed": 4.0,
+                "total_reviews": 87
+            }
+        },
+        "COPEC_HUECH_012": {
+            "station_id": "COPEC_HUECH_012",
+            "venue_type": "copec_business",
+            "services": {
+                "pronto_copec": {
+                    "available": true,
+                    "hours": "06:00-22:00",
+                    "products": [
+                        "café ejecutivo",
+                        "snacks",
+                        "almuerzo express"
+                    ]
+                },
+                "street_burger": {
+                    "available": false
+                },
+                "restrooms": {
+                    "available": true,
+                    "accessible": true
+                },
+                "wifi": {
+                    "available": true,
+                    "speed_mbps": 100,
+                    "password_required": false
+                },
+                "lounge": {
+                    "available": true,
+                    "capacity": 15,
+                    "amenities": [
+                        "cowork",
+                        "meeting pods"
+                    ]
+                },
+                "parking": {
+                    "available": true,
+                    "spots": 50,
+                    "ev_dedicated": 20
+                }
+            },
+            "ratings": {
+                "overall": 4.5,
+                "cleanliness": 4.6,
+                "service": 4.4,
+                "speed": 4.5,
+                "total_reviews": 156
+            }
+        }
+    },
+    "metadata": {
+        "last_updated": "2026-01-20T11:30:00-03:00",
+        "venue_types": [
+            "copec_standard",
+            "copec_full_service",
+            "copec_premium",
+            "copec_flagship",
+            "copec_business"
+        ]
+    }
+}

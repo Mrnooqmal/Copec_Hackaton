@@ -1,0 +1,246 @@
+{
+    "users": {
+        "user_001": {
+            "user_id": "user_001",
+            "name": "Carlos Mendoza",
+            "email": "carlos.mendoza@example.com",
+            "profile_type": "premium",
+            "preferences": {
+                "charger_type": "fast",
+                "max_wait_time_minutes": 10,
+                "preferred_amenities": [
+                    "café",
+                    "WiFi",
+                    "lounge"
+                ],
+                "price_sensitivity": "low",
+                "eco_mode": false,
+                "notifications": {
+                    "charging_complete": true,
+                    "queue_updates": true,
+                    "promotions": true
+                }
+            },
+            "charging_history": {
+                "total_sessions": 156,
+                "total_kwh": 4250,
+                "total_spent_clp": 1275000,
+                "favorite_stations": [
+                    "COPEC_LASCONDES_003",
+                    "COPEC_VITACURA_005"
+                ],
+                "avg_monthly_sessions": 12
+            },
+            "copec_points": 15800,
+            "membership_tier": "gold"
+        },
+        "user_002": {
+            "user_id": "user_002",
+            "name": "María González",
+            "email": "maria.gonzalez@example.com",
+            "profile_type": "standard",
+            "preferences": {
+                "charger_type": "any",
+                "max_wait_time_minutes": 20,
+                "preferred_amenities": [
+                    "baños",
+                    "tienda"
+                ],
+                "price_sensitivity": "high",
+                "eco_mode": true,
+                "notifications": {
+                    "charging_complete": true,
+                    "queue_updates": false,
+                    "promotions": true
+                }
+            },
+            "charging_history": {
+                "total_sessions": 48,
+                "total_kwh": 1080,
+                "total_spent_clp": 194400,
+                "favorite_stations": [
+                    "COPEC_MAIPU_006",
+                    "COPEC_SANMIGUEL_009"
+                ],
+                "avg_monthly_sessions": 4
+            },
+            "copec_points": 3200,
+            "membership_tier": "silver"
+        },
+        "user_003": {
+            "user_id": "user_003",
+            "name": "Andrés Rojas",
+            "email": "andres.rojas@example.com",
+            "profile_type": "business",
+            "preferences": {
+                "charger_type": "fast",
+                "max_wait_time_minutes": 5,
+                "preferred_amenities": [
+                    "WiFi",
+                    "lounge",
+                    "cowork"
+                ],
+                "price_sensitivity": "very_low",
+                "eco_mode": false,
+                "notifications": {
+                    "charging_complete": true,
+                    "queue_updates": true,
+                    "promotions": false
+                }
+            },
+            "charging_history": {
+                "total_sessions": 312,
+                "total_kwh": 9360,
+                "total_spent_clp": 2808000,
+                "favorite_stations": [
+                    "COPEC_HUECH_012",
+                    "COPEC_PROVIDENCIA_002"
+                ],
+                "avg_monthly_sessions": 26
+            },
+            "copec_points": 42500,
+            "membership_tier": "platinum",
+            "company": {
+                "name": "TechCorp Chile",
+                "fleet_size": 8,
+                "corporate_account": true
+            }
+        },
+        "user_004": {
+            "user_id": "user_004",
+            "name": "Valentina Soto",
+            "email": "valentina.soto@example.com",
+            "profile_type": "eco",
+            "preferences": {
+                "charger_type": "slow",
+                "max_wait_time_minutes": 60,
+                "preferred_amenities": [
+                    "café",
+                    "restaurante",
+                    "WiFi"
+                ],
+                "price_sensitivity": "medium",
+                "eco_mode": true,
+                "solar_preference": true,
+                "notifications": {
+                    "charging_complete": true,
+                    "queue_updates": false,
+                    "promotions": true
+                }
+            },
+            "charging_history": {
+                "total_sessions": 84,
+                "total_kwh": 2520,
+                "total_spent_clp": 453600,
+                "favorite_stations": [
+                    "COPEC_NUNOA_004",
+                    "COPEC_PENAL_008"
+                ],
+                "avg_monthly_sessions": 7
+            },
+            "copec_points": 7800,
+            "membership_tier": "silver"
+        }
+    },
+    "vehicles": {
+        "vehicle_001": {
+            "vehicle_id": "vehicle_001",
+            "owner_id": "user_001",
+            "brand": "Tesla",
+            "model": "Model 3 Long Range",
+            "year": 2024,
+            "battery_capacity_kwh": 82,
+            "current_battery_percent": 35,
+            "range_km": 580,
+            "current_range_km": 203,
+            "connector_types": [
+                "CCS2",
+                "Type2"
+            ],
+            "max_charge_rate_kw": 250,
+            "efficiency_kwh_per_100km": 14.5,
+            "license_plate": "EV-1234",
+            "color": "Midnight Silver",
+            "last_service": "2025-11-15",
+            "odometer_km": 28500
+        },
+        "vehicle_002": {
+            "vehicle_id": "vehicle_002",
+            "owner_id": "user_002",
+            "brand": "BYD",
+            "model": "Dolphin",
+            "year": 2025,
+            "battery_capacity_kwh": 60,
+            "current_battery_percent": 42,
+            "range_km": 427,
+            "current_range_km": 179,
+            "connector_types": [
+                "CCS2",
+                "Type2"
+            ],
+            "max_charge_rate_kw": 88,
+            "efficiency_kwh_per_100km": 14.0,
+            "license_plate": "EV-5678",
+            "color": "Coral Blue",
+            "last_service": "2025-12-20",
+            "odometer_km": 12300
+        },
+        "vehicle_003": {
+            "vehicle_id": "vehicle_003",
+            "owner_id": "user_003",
+            "brand": "Porsche",
+            "model": "Taycan 4S",
+            "year": 2024,
+            "battery_capacity_kwh": 93.4,
+            "current_battery_percent": 22,
+            "range_km": 464,
+            "current_range_km": 102,
+            "connector_types": [
+                "CCS2",
+                "Type2"
+            ],
+            "max_charge_rate_kw": 270,
+            "efficiency_kwh_per_100km": 20.2,
+            "license_plate": "EV-9012",
+            "color": "Gentian Blue",
+            "last_service": "2025-10-05",
+            "odometer_km": 45200
+        },
+        "vehicle_004": {
+            "vehicle_id": "vehicle_004",
+            "owner_id": "user_004",
+            "brand": "Volkswagen",
+            "model": "ID.4 Pro",
+            "year": 2025,
+            "battery_capacity_kwh": 77,
+            "current_battery_percent": 68,
+            "range_km": 520,
+            "current_range_km": 354,
+            "connector_types": [
+                "CCS2",
+                "Type2"
+            ],
+            "max_charge_rate_kw": 135,
+            "efficiency_kwh_per_100km": 15.8,
+            "license_plate": "EV-3456",
+            "color": "Kings Red",
+            "last_service": "2025-12-01",
+            "odometer_km": 8900
+        }
+    },
+    "metadata": {
+        "last_updated": "2026-01-20T11:30:00-03:00",
+        "profile_types": [
+            "standard",
+            "premium",
+            "business",
+            "eco"
+        ],
+        "membership_tiers": [
+            "bronze",
+            "silver",
+            "gold",
+            "platinum"
+        ]
+    }
+}

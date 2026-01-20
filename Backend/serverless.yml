@@ -547,6 +547,91 @@ functions:
           path: /inbox/{proxy+}
           method: any
 
+  # ========================================
+  # EV OPTIMIZER (Copec Electromovilidad)
+  # ========================================
+  evRecommend:
+    handler: handlers/ev-optimizer.recommend
+    timeout: 30
+    events:
+      - httpApi:
+          path: /api/recommend
+          method: POST
+
+  evNearbyStations:
+    handler: handlers/ev-optimizer.nearbyStations
+    events:
+      - httpApi:
+          path: /api/stations/nearby
+          method: GET
+
+  evProcessVoice:
+    handler: handlers/ev-optimizer.processVoice
+    timeout: 30
+    events:
+      - httpApi:
+          path: /api/voice/process
+          method: POST
+
+  # ========================================
+  # EV DATA ENDPOINTS (Datos Simulados)
+  # ========================================
+  evChargingMetrics:
+    handler: handlers/ev-data.getChargingMetrics
+    events:
+      - httpApi:
+          path: /api/charging/metrics
+          method: GET
+
+  evQueueDensity:
+    handler: handlers/ev-data.getQueueDensity
+    events:
+      - httpApi:
+          path: /api/charging/queue
+          method: GET
+      - httpApi:
+          path: /api/charging/queue/{stationId}
+          method: GET
+
+  evVenueDetails:
+    handler: handlers/ev-data.getVenueDetails
+    events:
+      - httpApi:
+          path: /api/venues
+          method: GET
+      - httpApi:
+          path: /api/venues/{stationId}
+          method: GET
+
+  evUserProfile:
+    handler: handlers/ev-data.getUserProfile
+    events:
+      - httpApi:
+          path: /api/user/{userId}/profile
+          method: GET
+
+  evUserVehicle:
+    handler: handlers/ev-data.getUserVehicle
+    events:
+      - httpApi:
+          path: /api/user/{userId}/vehicle
+          method: GET
+
+  evAIContext:
+    handler: handlers/ev-data.getAIContext
+    timeout: 30
+    events:
+      - httpApi:
+          path: /api/context
+          method: POST
+
+  evStationsEnriched:
+    handler: handlers/ev-data.getAllStationsEnriched
+    events:
+      - httpApi:
+          path: /api/stations/all
+          method: GET
+
 resources:
   Resources:
     # S3 Bucket para documentos

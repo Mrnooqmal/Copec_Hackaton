@@ -1,0 +1,199 @@
+{
+  "stations": [
+    {
+      "id": "COPEC_ALAMEDA_001",
+      "name": "Copec Alameda Centro",
+      "location": { "lat": -33.4489, "lng": -70.6693 },
+      "address": "Av. Libertador Bernardo O'Higgins 1449, Santiago Centro",
+      "chargers": [
+        { "id": "CHG_001_A", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_001_B", "type": "slow", "power": 50, "status": "occupied", "connector": "Type2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["07:00-09:00", "18:00-20:00"],
+        "avg_wait_time": 12,
+        "nearby_amenities": ["café", "baños", "WiFi", "tienda"]
+      }
+    },
+    {
+      "id": "COPEC_PROVIDENCIA_002",
+      "name": "Copec Providencia",
+      "location": { "lat": -33.4264, "lng": -70.6101 },
+      "address": "Av. Providencia 2124, Providencia",
+      "chargers": [
+        { "id": "CHG_002_A", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_002_B", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["08:00-10:00", "17:00-19:00"],
+        "avg_wait_time": 8,
+        "nearby_amenities": ["café", "restaurante", "WiFi", "estacionamiento"]
+      }
+    },
+    {
+      "id": "COPEC_LASCONDES_003",
+      "name": "Copec Las Condes",
+      "location": { "lat": -33.4103, "lng": -70.5673 },
+      "address": "Av. Apoquindo 4500, Las Condes",
+      "chargers": [
+        { "id": "CHG_003_A", "type": "fast", "power": 150, "status": "occupied", "connector": "CCS2" },
+        { "id": "CHG_003_B", "type": "slow", "power": 50, "status": "available", "connector": "Type2" },
+        { "id": "CHG_003_C", "type": "fast", "power": 150, "status": "available", "connector": "CHAdeMO" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["07:30-09:30", "18:00-20:30"],
+        "avg_wait_time": 15,
+        "nearby_amenities": ["café", "baños", "WiFi", "tienda", "restaurante"]
+      }
+    },
+    {
+      "id": "COPEC_NUNOA_004",
+      "name": "Copec Ñuñoa",
+      "location": { "lat": -33.4563, "lng": -70.5983 },
+      "address": "Av. Irarrázaval 3450, Ñuñoa",
+      "chargers": [
+        { "id": "CHG_004_A", "type": "slow", "power": 50, "status": "available", "connector": "Type2" },
+        { "id": "CHG_004_B", "type": "slow", "power": 50, "status": "occupied", "connector": "Type2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["08:00-10:00", "19:00-21:00"],
+        "avg_wait_time": 18,
+        "nearby_amenities": ["café", "baños", "tienda"]
+      }
+    },
+    {
+      "id": "COPEC_VITACURA_005",
+      "name": "Copec Vitacura",
+      "location": { "lat": -33.3978, "lng": -70.5789 },
+      "address": "Av. Vitacura 5600, Vitacura",
+      "chargers": [
+        { "id": "CHG_005_A", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_005_B", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_005_C", "type": "slow", "power": 50, "status": "maintenance", "connector": "Type2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["07:00-09:00", "17:30-19:30"],
+        "avg_wait_time": 10,
+        "nearby_amenities": ["café premium", "baños", "WiFi", "lounge", "restaurante"]
+      }
+    },
+    {
+      "id": "COPEC_MAIPU_006",
+      "name": "Copec Maipú",
+      "location": { "lat": -33.5167, "lng": -70.7583 },
+      "address": "Av. Pajaritos 3200, Maipú",
+      "chargers": [
+        { "id": "CHG_006_A", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_006_B", "type": "slow", "power": 50, "status": "available", "connector": "Type2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["06:30-08:30", "18:00-20:00"],
+        "avg_wait_time": 6,
+        "nearby_amenities": ["café", "baños", "tienda", "estacionamiento amplio"]
+      }
+    },
+    {
+      "id": "COPEC_LAFL_007",
+      "name": "Copec La Florida",
+      "location": { "lat": -33.5205, "lng": -70.5980 },
+      "address": "Av. Vicuña Mackenna 7200, La Florida",
+      "chargers": [
+        { "id": "CHG_007_A", "type": "fast", "power": 150, "status": "occupied", "connector": "CCS2" },
+        { "id": "CHG_007_B", "type": "fast", "power": 150, "status": "occupied", "connector": "CCS2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["07:00-09:00", "17:30-20:00"],
+        "avg_wait_time": 25,
+        "nearby_amenities": ["café", "baños", "WiFi", "mall cercano"]
+      }
+    },
+    {
+      "id": "COPEC_PENAL_008",
+      "name": "Copec Peñalolén",
+      "location": { "lat": -33.4833, "lng": -70.5167 },
+      "address": "Av. Tobalaba 9500, Peñalolén",
+      "chargers": [
+        { "id": "CHG_008_A", "type": "slow", "power": 50, "status": "available", "connector": "Type2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["08:00-10:00", "18:00-20:00"],
+        "avg_wait_time": 20,
+        "nearby_amenities": ["café", "baños"]
+      }
+    },
+    {
+      "id": "COPEC_SANMIGUEL_009",
+      "name": "Copec San Miguel",
+      "location": { "lat": -33.4978, "lng": -70.6523 },
+      "address": "Gran Avenida José Miguel Carrera 4800, San Miguel",
+      "chargers": [
+        { "id": "CHG_009_A", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_009_B", "type": "slow", "power": 50, "status": "available", "connector": "Type2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["07:00-09:00", "17:00-19:00"],
+        "avg_wait_time": 8,
+        "nearby_amenities": ["café", "baños", "tienda", "WiFi"]
+      }
+    },
+    {
+      "id": "COPEC_RECOLETA_010",
+      "name": "Copec Recoleta",
+      "location": { "lat": -33.4089, "lng": -70.6425 },
+      "address": "Av. Recoleta 3200, Recoleta",
+      "chargers": [
+        { "id": "CHG_010_A", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_010_B", "type": "fast", "power": 150, "status": "maintenance", "connector": "CCS2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["06:00-08:00", "18:00-20:00"],
+        "avg_wait_time": 12,
+        "nearby_amenities": ["café", "baños", "WiFi"]
+      }
+    },
+    {
+      "id": "COPEC_PUENTE_011",
+      "name": "Copec Puente Alto",
+      "location": { "lat": -33.6100, "lng": -70.5758 },
+      "address": "Av. Concha y Toro 2800, Puente Alto",
+      "chargers": [
+        { "id": "CHG_011_A", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_011_B", "type": "slow", "power": 50, "status": "occupied", "connector": "Type2" },
+        { "id": "CHG_011_C", "type": "slow", "power": 50, "status": "available", "connector": "Type2" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["05:30-07:30", "18:00-20:30"],
+        "avg_wait_time": 14,
+        "nearby_amenities": ["café", "baños", "tienda", "estacionamiento"]
+      }
+    },
+    {
+      "id": "COPEC_HUECH_012",
+      "name": "Copec Huechuraba",
+      "location": { "lat": -33.3678, "lng": -70.6345 },
+      "address": "Ciudad Empresarial, Av. del Valle 945, Huechuraba",
+      "chargers": [
+        { "id": "CHG_012_A", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_012_B", "type": "fast", "power": 150, "status": "available", "connector": "CCS2" },
+        { "id": "CHG_012_C", "type": "slow", "power": 50, "status": "available", "connector": "Type2" },
+        { "id": "CHG_012_D", "type": "slow", "power": 50, "status": "available", "connector": "CHAdeMO" }
+      ],
+      "usage_factors": {
+        "peak_hours": ["07:30-09:30", "17:00-19:00"],
+        "avg_wait_time": 5,
+        "nearby_amenities": ["café", "baños", "WiFi", "restaurantes", "cowork cercano"]
+      }
+    }
+  ],
+  "metadata": {
+    "last_updated": "2026-01-20T11:00:00-03:00",
+    "total_stations": 12,
+    "total_chargers": 26,
+    "coverage_area": "Región Metropolitana - Santiago",
+    "pricing": {
+      "fast_kwh": 250,
+      "slow_kwh": 180,
+      "currency": "CLP"
+    }
+  }
+}
