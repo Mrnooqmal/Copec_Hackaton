@@ -1,16 +1,15 @@
-/**
- * StationMap Component - Copec EV Assistant
- * Interactive Leaflet map showing charging stations in Santiago
- */
-
 import { useEffect, useState, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import StationCard from './StationCard';
 import VoiceInput from './VoiceInput';
+import TripPlanner from './TripPlanner';
+import AIChat from './AIChat';
+import { Icon } from './Icon';
 import stationsData from '../data/stations_geo.json';
 import CopecLogo from '../assets/Copec_Logo_2023.svg';
+import CopecCielo from '../assets/Copec_Cielo.png';
 
 // Fix Leaflet default icon issue
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
@@ -29,22 +28,21 @@ const COPEC_COLORS = {
 };
 
 // Custom marker icons
-const createMarkerIcon = (color: string, hasAvailable: boolean) => {
-    const svgIcon = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="32" height="48">
-      <path fill="${color}" stroke="${COPEC_COLORS.secondary}" stroke-width="1.5" d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z"/>
-      <circle fill="${COPEC_COLORS.white}" cx="12" cy="11" r="6"/>
-      <text x="12" y="14" text-anchor="middle" fill="${hasAvailable ? COPEC_COLORS.available : COPEC_COLORS.occupied}" font-size="8" font-weight="bold">⚡</text>
-    </svg>
-  `;
-
-    return L.divIcon({
-        html: svgIcon,
-        className: 'custom-marker',
-        iconSize: [32, 48],
-        iconAnchor: [16, 48],
-        popupAnchor: [0, -48]
-    });
+const createMarkerIcon = (statusClass: 'available' | 'partial' | 'occupied') => {
+        return L.divIcon({
+                html: `
+            <div class="copec-marker">
+                <div class="marker-body">
+                    <div class="marker-image" style="background-image:url(${CopecCielo});"></div>
+                </div>
+                <span class="marker-dot ${statusClass}"></span>
+            </div>
+        `,
+                className: 'custom-marker',
+                iconSize: [48, 64],
+                iconAnchor: [24, 58],
+                popupAnchor: [0, -56]
+        });
 };
 
 // Station type definition
@@ -115,7 +113,7 @@ function LocationControl({ onLocationFound }: { onLocationFound: (lat: number, l
             className="location-button"
             title="Usar mi ubicación"
         >
-            📍
+            <Icon name="mapPin" size={18} />
         </button>
     );
 }
@@ -129,6 +127,8 @@ export default function StationMap() {
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [batteryLevel, setBatteryLevel] = useState(50);
     const [urgency, setUrgency] = useState<'low' | 'normal' | 'high'>('normal');
+    const [showTripPlanner, setShowTripPlanner] = useState(false);
+    const [showAIChat, setShowAIChat] = useState(false);
 
     // Santiago center coordinates
     const defaultCenter: [number, number] = [-33.4489, -70.6693];
@@ -225,6 +225,13 @@ export default function StationMap() {
         return COPEC_COLORS.primary;
     };
 
+    const getStatusClass = (station: Station) => {
+        const availableCount = station.chargers.filter(c => c.status === 'available').length;
+        if (availableCount === 0) return 'occupied';
+        if (availableCount === station.chargers.length) return 'available';
+        return 'partial';
+    };
+
     return (
         <div className="station-map-container">
             {/* Header */}
@@ -264,7 +271,11 @@ export default function StationMap() {
                                 className={`urgency-btn ${urgency === u ? 'active' : ''}`}
                                 onClick={() => setUrgency(u)}
                             >
-                                {u === 'low' ? '🐢 Baja' : u === 'normal' ? '⚡ Normal' : '🚀 Alta'}
+                                <Icon
+                                    name={u === 'low' ? 'leaf' : u === 'normal' ? 'gauge' : 'bolt'}
+                                    size={16}
+                                />
+                                <span>{u === 'low' ? 'Baja' : u === 'normal' ? 'Equilibrada' : 'Alta'}</span>
                             </button>
                         ))}
                     </div>
@@ -275,17 +286,25 @@ export default function StationMap() {
                     onClick={handleGetRecommendations}
                     disabled={loading}
                 >
-                    {loading ? '⏳ Buscando...' : '🔍 Recomendar estación'}
+                    {loading ? (
+                        'Buscando...'
+                    ) : (
+                        <>
+                            <Icon name="search" size={16} />
+                            <span>Recomendar estación</span>
+                        </>
+                    )}
                 </button>
             </div>
 
             {/* Map */}
             <div className="map-wrapper">
-                <MapContainer
-                    center={defaultCenter}
-                    zoom={defaultZoom}
-                    style={{ height: '100%', width: '100%' }}
-                >
+                <div className="map-surface">
+                    <MapContainer
+                        center={defaultCenter}
+                        zoom={defaultZoom}
+                        style={{ height: '100%', width: '100%' }}
+                    >
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -300,7 +319,7 @@ export default function StationMap() {
                         <Marker
                             position={[userLocation.lat, userLocation.lng]}
                             icon={L.divIcon({
-                                html: '<div class="user-marker">📍</div>',
+                                html: '<div class="user-marker"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D60812" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12.5A7 7 0 0 0 5 9.5C5 15.5 12 22 12 22Z"/><circle cx="12" cy="9.5" r="3.5"/></svg></div>',
                                 className: 'user-marker-container',
                                 iconSize: [30, 30],
                                 iconAnchor: [15, 30]
@@ -312,12 +331,12 @@ export default function StationMap() {
 
                     {/* Station markers */}
                     {stations.map((station) => {
-                        const hasAvailable = station.chargers.some(c => c.status === 'available');
+                        const available = station.chargers.filter(c => c.status === 'available').length;
                         return (
                             <Marker
                                 key={station.id}
                                 position={[station.location.lat, station.location.lng]}
-                                icon={createMarkerIcon(getMarkerColor(station), hasAvailable)}
+                                icon={createMarkerIcon(getStatusClass(station))}
                                 eventHandlers={{
                                     click: () => setSelectedStation(station)
                                 }}
@@ -325,13 +344,20 @@ export default function StationMap() {
                                 <Popup>
                                     <div className="marker-popup">
                                         <strong>{station.name}</strong>
-                                        <p>{station.chargers.filter(c => c.status === 'available').length} / {station.chargers.length} disponibles</p>
+                                        <p>{available} / {station.chargers.length} disponibles</p>
                                     </div>
                                 </Popup>
+                                <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
+                                    <div className="marker-popup">
+                                        <strong>{station.name}</strong>
+                                        <p>{available} / {station.chargers.length} disponibles</p>
+                                    </div>
+                                </Tooltip>
                             </Marker>
                         );
                     })}
-                </MapContainer>
+                    </MapContainer>
+                </div>
             </div>
 
             {/* Station detail card */}
@@ -347,8 +373,13 @@ export default function StationMap() {
             {showRecommendations && recommendations.length > 0 && (
                 <div className="recommendations-panel">
                     <div className="panel-header">
-                        <h2>🎯 Recomendaciones</h2>
-                        <button onClick={() => setShowRecommendations(false)}>✕</button>
+                        <div className="panel-title">
+                            <Icon name="target" size={18} />
+                            <h2>Recomendaciones</h2>
+                        </div>
+                        <button onClick={() => setShowRecommendations(false)} aria-label="Cerrar">
+                            <Icon name="close" size={16} />
+                        </button>
                     </div>
                     <div className="recommendations-list">
                         {recommendations.map((rec, index) => (
@@ -360,9 +391,9 @@ export default function StationMap() {
                                 <h3>{rec.station_name}</h3>
                                 <p className="rec-reasoning">{rec.reasoning}</p>
                                 <div className="rec-details">
-                                    <span>🚗 {rec.eta_minutes} min</span>
-                                    <span>⚡ {rec.charging_time_minutes} min carga</span>
-                                    <span>💰 ${rec.estimated_cost_clp.toLocaleString('es-CL')}</span>
+                                    <span><Icon name="car" size={14} /> {rec.eta_minutes} min</span>
+                                    <span><Icon name="bolt" size={14} /> {rec.charging_time_minutes} min carga</span>
+                                    <span><Icon name="wallet" size={14} /> ${rec.estimated_cost_clp.toLocaleString('es-CL')}</span>
                                 </div>
                                 <div className="rec-amenities">
                                     {rec.amenities.slice(0, 3).map((a, i) => (
@@ -375,7 +406,7 @@ export default function StationMap() {
                                     rel="noopener noreferrer"
                                     className="navigate-btn"
                                 >
-                                    🧭 Navegar
+                                    <Icon name="compass" size={14} /> Navegar
                                 </a>
                             </div>
                         ))}
@@ -398,6 +429,52 @@ export default function StationMap() {
                     <span>Ocupado</span>
                 </div>
             </div>
+
+            {/* Floating Action Buttons */}
+            <div className="fab-stack">
+                <button
+                    className="fab"
+                    onClick={() => setShowTripPlanner(true)}
+                    title="Planificar viaje"
+                >
+                    <Icon name="route" size={18} />
+                </button>
+
+                <button
+                    className="fab"
+                    onClick={() => setShowAIChat(true)}
+                    title="Asistente IA"
+                >
+                    <Icon name="chat" size={18} />
+                </button>
+            </div>
+
+            {/* Trip Planner Modal */}
+            {showTripPlanner && (
+                <TripPlanner
+                    onClose={() => setShowTripPlanner(false)}
+                    userLocation={userLocation}
+                />
+            )}
+
+            {/* AI Chat */}
+            {showAIChat && (
+                <AIChat
+                    isOpen={showAIChat}
+                    onClose={() => setShowAIChat(false)}
+                    userContext={{
+                        batteryLevel,
+                        location: userLocation || undefined,
+                        urgency
+                    }}
+                    onAction={(action) => {
+                        if (action.type === 'open_trip_planner') {
+                            setShowAIChat(false);
+                            setShowTripPlanner(true);
+                        }
+                    }}
+                />
+            )}
         </div>
     );
 }

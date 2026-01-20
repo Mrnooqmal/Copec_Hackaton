@@ -4,6 +4,7 @@
  */
 
 import { useState, useRef } from 'react';
+import { Icon } from './Icon';
 
 interface VoiceInputProps {
     onResult: (transcript: string) => void;
@@ -164,11 +165,17 @@ export default function VoiceInput({ onResult }: VoiceInputProps) {
                 title={isRecording ? 'Detener grabación' : 'Hablar'}
             >
                 {isProcessing ? (
-                    <span className="processing-icon">⏳</span>
+                    <span className="processing-icon" aria-hidden>
+                        <Icon name="clock" size={16} />
+                    </span>
                 ) : isRecording ? (
-                    <span className="recording-icon">🔴</span>
+                    <span className="recording-icon" aria-hidden>
+                        <Icon name="stop" size={16} />
+                    </span>
                 ) : (
-                    <span className="mic-icon">🎤</span>
+                    <span className="mic-icon" aria-hidden>
+                        <Icon name="mic" size={16} />
+                    </span>
                 )}
             </button>
 

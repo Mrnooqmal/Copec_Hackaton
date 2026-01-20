@@ -16,6 +16,12 @@ provider:
   environment:
     IS_OFFLINE: ${env:IS_OFFLINE, 'false'}
     BEDROCK_MODEL_ID: 'anthropic.claude-3-sonnet-20240229-v1:0'
+    STATIONS_TABLE: ${self:service}-stations-${self:provider.stage}
+    VENUES_TABLE: ${self:service}-venues-${self:provider.stage}
+    USERS_TABLE: ${self:service}-users-${self:provider.stage}
+    VEHICLES_TABLE: ${self:service}-vehicles-${self:provider.stage}
+    TRIPS_TABLE: ${self:service}-trips-${self:provider.stage}
+    SESSIONS_TABLE: ${self:service}-sessions-${self:provider.stage}
   httpApi:
     cors:
       allowedOrigins:
@@ -26,6 +32,8 @@ provider:
       allowedMethods:
         - GET
         - POST
+        - PUT
+        - DELETE
         - OPTIONS
   iam:
     role:
@@ -37,6 +45,25 @@ provider:
           Resource:
             - "arn:aws:bedrock:*::foundation-model/anthropic.*"
             - "arn:aws:bedrock:*::foundation-model/amazon.*"
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
+            - dynamodb:BatchGetItem
+          Resource:
+            - !GetAtt StationsTable.Arn
+            - !GetAtt VenuesTable.Arn
+            - !GetAtt UsersTable.Arn
+            - !GetAtt VehiclesTable.Arn
+            - !Sub ${VehiclesTable.Arn}/index/*
+            - !GetAtt TripsTable.Arn
+            - !Sub ${TripsTable.Arn}/index/*
+            - !GetAtt ChargingSessionsTable.Arn
 
 package:
   individually: false
@@ -130,3 +157,137 @@ functions:
       - httpApi:
           path: /api/stations/all
           method: GET
+
+  # ========================================
+  # AI CHAT (Conversational Interface)
+  # ========================================
+  evChat:
+    handler: handlers/ev-chat.chat
+    timeout: 60
+    events:
+      - httpApi:
+          path: /api/chat
+          method: POST
+
+  # ========================================
+  # TRIP PLANNER
+  # ========================================
+  evPlanTrip:
+    handler: handlers/ev-trips.planTrip
+    timeout: 30
+    events:
+      - httpApi:
+          path: /api/trips/plan
+          method: POST
+
+  evGetTrips:
+    handler: handlers/ev-trips.getUserTrips
+    events:
+      - httpApi:
+          path: /api/trips/{userId}
+          method: GET
+
+  evSaveTrip:
+    handler: handlers/ev-trips.saveTrip
+    events:
+      - httpApi:
+          path: /api/trips
+          method: POST
+
+resources:
+  Resources:
+    # Stations Table
+    StationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.STATIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: stationId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: stationId
+            KeyType: HASH
+
+    # Venues Table (Pronto Copec, Street Burger, etc.)
+    VenuesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.VENUES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: stationId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: stationId
+            KeyType: HASH
+
+    # Users Table
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+
+    # Vehicles Table (with GSI for owner lookup)
+    VehiclesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.VEHICLES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: vehicleId
+            AttributeType: S
+          - AttributeName: ownerId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: vehicleId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: ownerId-index
+            KeySchema:
+              - AttributeName: ownerId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+    # Trips Table (for trip planning)
+    TripsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TRIPS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: tripId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tripId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: userId-index
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+
+    # Charging Sessions Table
+    ChargingSessionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.SESSIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: sessionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: sessionId
+            KeyType: HASH

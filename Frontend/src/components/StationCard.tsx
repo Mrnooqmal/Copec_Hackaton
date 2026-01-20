@@ -3,6 +3,8 @@
  * Detailed station information card
  */
 
+import { Icon } from './Icon';
+
 interface Charger {
     id: string;
     type: 'fast' | 'slow';
@@ -55,25 +57,20 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
         }
     };
 
-    const getConnectorIcon = (connector: string) => {
-        switch (connector) {
-            case 'CCS2': return '🔌';
-            case 'Type2': return '🔋';
-            case 'CHAdeMO': return '⚡';
-            default: return '🔌';
-        }
-    };
-
     return (
         <div className="station-card-overlay" onClick={onClose}>
             <div className="station-card" onClick={(e) => e.stopPropagation()}>
-                <button className="close-btn" onClick={onClose}>✕</button>
+                <button className="close-btn" onClick={onClose} aria-label="Cerrar">
+                    <Icon name="close" size={16} />
+                </button>
 
                 <div className="card-header">
                     <h2>{station.name}</h2>
                     <p className="address">{station.address}</p>
                     {station.distance !== undefined && (
-                        <p className="distance">📍 {station.distance} km {station.eta_minutes && `• ${station.eta_minutes} min`}</p>
+                        <p className="distance">
+                            <Icon name="mapPin" size={14} /> {station.distance} km {station.eta_minutes && `• ${station.eta_minutes} min`}
+                        </p>
                     )}
                 </div>
 
@@ -101,11 +98,11 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                                 className={`charger-item ${charger.status}`}
                             >
                                 <div className="charger-icon">
-                                    {getConnectorIcon(charger.connector)}
+                                    <Icon name="plug" size={18} />
                                 </div>
                                 <div className="charger-info">
                                     <span className="charger-type">
-                                        {charger.type === 'fast' ? '⚡ Rápido' : '🔋 Lento'}
+                                        <Icon name={charger.type === 'fast' ? 'bolt' : 'battery'} size={14} /> {charger.type === 'fast' ? 'Rápido' : 'Lento'}
                                     </span>
                                     <span className="charger-power">{charger.power} kW</span>
                                     <span className="charger-connector">{charger.connector}</span>
@@ -125,12 +122,12 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                     <h3>Información de uso</h3>
                     <div className="usage-grid">
                         <div className="usage-item">
-                            <span className="usage-icon">⏱️</span>
+                            <span className="usage-icon"><Icon name="clock" size={16} /></span>
                             <span className="usage-label">Tiempo promedio de espera</span>
                             <span className="usage-value">{station.usage_factors.avg_wait_time} min</span>
                         </div>
                         <div className="usage-item">
-                            <span className="usage-icon">🕐</span>
+                            <span className="usage-icon"><Icon name="gauge" size={16} /></span>
                             <span className="usage-label">Horarios pico</span>
                             <span className="usage-value">{station.usage_factors.peak_hours.join(', ')}</span>
                         </div>
@@ -142,15 +139,7 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                     <div className="amenities-list">
                         {station.usage_factors.nearby_amenities.map((amenity, index) => (
                             <span key={index} className="amenity-badge">
-                                {amenity === 'café' && '☕'}
-                                {amenity === 'baños' && '🚻'}
-                                {amenity === 'WiFi' && '📶'}
-                                {amenity === 'tienda' && '🏪'}
-                                {amenity === 'restaurante' && '🍽️'}
-                                {amenity === 'estacionamiento' && '🅿️'}
-                                {amenity === 'lounge' && '🛋️'}
-                                {!['café', 'baños', 'WiFi', 'tienda', 'restaurante', 'estacionamiento', 'lounge'].some(a => amenity.includes(a)) && '✓'}
-                                {' '}{amenity}
+                                {renderAmenityIcon(amenity)} {amenity}
                             </span>
                         ))}
                     </div>
@@ -161,7 +150,7 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                         className="action-btn primary"
                         onClick={onRecommend}
                     >
-                        🎯 Recomendar para mí
+                        <Icon name="target" size={16} /> Recomendar para mí
                     </button>
                     <a
                         href={`https://maps.google.com/?daddr=${station.location.lat},${station.location.lng}`}
@@ -169,10 +158,22 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                         rel="noopener noreferrer"
                         className="action-btn secondary"
                     >
-                        🧭 Navegar
+                        <Icon name="compass" size={16} /> Navegar
                     </a>
                 </div>
             </div>
         </div>
     );
+}
+
+function renderAmenityIcon(amenity: string) {
+    const normalized = amenity.toLowerCase();
+    if (normalized.includes('caf') || normalized.includes('coffee')) return <Icon name="coffee" size={14} />;
+    if (normalized.includes('baño') || normalized.includes('restroom') || normalized.includes('wc')) return <Icon name="restroom" size={14} />;
+    if (normalized.includes('wifi')) return <Icon name="wifi" size={14} />;
+    if (normalized.includes('tienda') || normalized.includes('shop')) return <Icon name="store" size={14} />;
+    if (normalized.includes('restaur')) return <Icon name="restaurant" size={14} />;
+    if (normalized.includes('estacionamiento') || normalized.includes('parking')) return <Icon name="parking" size={14} />;
+    if (normalized.includes('lounge')) return <Icon name="lounge" size={14} />;
+    return <Icon name="spark" size={14} />;
 }
