@@ -7,8 +7,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { MapPin, Zap, Search, Loader2, Turtle, Rocket, Car, DollarSign, Navigation, X, Target, MessageSquare, Route } from 'lucide-react';
 import StationCard from './StationCard';
 import VoiceInput from './VoiceInput';
+import TripPlanner from './TripPlanner';
+import AIChat from './AIChat';
 import stationsData from '../data/stations_geo.json';
 import CopecLogo from '../assets/Copec_Logo_2023.svg';
 
@@ -115,7 +118,7 @@ function LocationControl({ onLocationFound }: { onLocationFound: (lat: number, l
             className="location-button"
             title="Usar mi ubicación"
         >
-            📍
+            <MapPin size={20} />
         </button>
     );
 }
@@ -129,6 +132,8 @@ export default function StationMap() {
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [batteryLevel, setBatteryLevel] = useState(50);
     const [urgency, setUrgency] = useState<'low' | 'normal' | 'high'>('normal');
+    const [showTripPlanner, setShowTripPlanner] = useState(false);
+    const [showAIChat, setShowAIChat] = useState(false);
 
     // Santiago center coordinates
     const defaultCenter: [number, number] = [-33.4489, -70.6693];
@@ -264,7 +269,7 @@ export default function StationMap() {
                                 className={`urgency-btn ${urgency === u ? 'active' : ''}`}
                                 onClick={() => setUrgency(u)}
                             >
-                                {u === 'low' ? '🐢 Baja' : u === 'normal' ? '⚡ Normal' : '🚀 Alta'}
+                                {u === 'low' ? <><Turtle size={14} /> Baja</> : u === 'normal' ? <><Zap size={14} /> Normal</> : <><Rocket size={14} /> Alta</>}
                             </button>
                         ))}
                     </div>
@@ -275,7 +280,7 @@ export default function StationMap() {
                     onClick={handleGetRecommendations}
                     disabled={loading}
                 >
-                    {loading ? '⏳ Buscando...' : '🔍 Recomendar estación'}
+                    {loading ? <><Loader2 size={16} className="spin" /> Buscando...</> : <><Search size={16} /> Recomendar estación</>}
                 </button>
             </div>
 
@@ -300,7 +305,7 @@ export default function StationMap() {
                         <Marker
                             position={[userLocation.lat, userLocation.lng]}
                             icon={L.divIcon({
-                                html: '<div class="user-marker">📍</div>',
+                                html: '<div class="user-marker"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D60812" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>',
                                 className: 'user-marker-container',
                                 iconSize: [30, 30],
                                 iconAnchor: [15, 30]
@@ -347,8 +352,8 @@ export default function StationMap() {
             {showRecommendations && recommendations.length > 0 && (
                 <div className="recommendations-panel">
                     <div className="panel-header">
-                        <h2>🎯 Recomendaciones</h2>
-                        <button onClick={() => setShowRecommendations(false)}>✕</button>
+                        <h2><Target size={18} /> Recomendaciones</h2>
+                        <button onClick={() => setShowRecommendations(false)}><X size={16} /></button>
                     </div>
                     <div className="recommendations-list">
                         {recommendations.map((rec, index) => (
@@ -360,9 +365,9 @@ export default function StationMap() {
                                 <h3>{rec.station_name}</h3>
                                 <p className="rec-reasoning">{rec.reasoning}</p>
                                 <div className="rec-details">
-                                    <span>🚗 {rec.eta_minutes} min</span>
-                                    <span>⚡ {rec.charging_time_minutes} min carga</span>
-                                    <span>💰 ${rec.estimated_cost_clp.toLocaleString('es-CL')}</span>
+                                    <span><Car size={14} /> {rec.eta_minutes} min</span>
+                                    <span><Zap size={14} /> {rec.charging_time_minutes} min carga</span>
+                                    <span><DollarSign size={14} /> ${rec.estimated_cost_clp.toLocaleString('es-CL')}</span>
                                 </div>
                                 <div className="rec-amenities">
                                     {rec.amenities.slice(0, 3).map((a, i) => (
@@ -375,7 +380,7 @@ export default function StationMap() {
                                     rel="noopener noreferrer"
                                     className="navigate-btn"
                                 >
-                                    🧭 Navegar
+                                    <Navigation size={14} /> Navegar
                                 </a>
                             </div>
                         ))}
@@ -398,6 +403,50 @@ export default function StationMap() {
                     <span>Ocupado</span>
                 </div>
             </div>
+
+            {/* Floating Action Buttons */}
+            <button
+                className="trip-planner-toggle"
+                onClick={() => setShowTripPlanner(true)}
+                title="Planificar viaje"
+            >
+                <Route size={24} />
+            </button>
+
+            <button
+                className="chat-toggle"
+                onClick={() => setShowAIChat(true)}
+                title="Asistente IA"
+            >
+                <MessageSquare size={24} />
+            </button>
+
+            {/* Trip Planner Modal */}
+            {showTripPlanner && (
+                <TripPlanner
+                    onClose={() => setShowTripPlanner(false)}
+                    userLocation={userLocation}
+                />
+            )}
+
+            {/* AI Chat */}
+            {showAIChat && (
+                <AIChat
+                    isOpen={showAIChat}
+                    onClose={() => setShowAIChat(false)}
+                    userContext={{
+                        batteryLevel,
+                        location: userLocation || undefined,
+                        urgency
+                    }}
+                    onAction={(action) => {
+                        if (action.type === 'open_trip_planner') {
+                            setShowAIChat(false);
+                            setShowTripPlanner(true);
+                        }
+                    }}
+                />
+            )}
         </div>
     );
 }

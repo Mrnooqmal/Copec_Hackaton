@@ -4,6 +4,7 @@
  */
 
 import { useState, useRef } from 'react';
+import { Mic, MicOff, Loader2 } from 'lucide-react';
 
 interface VoiceInputProps {
     onResult: (transcript: string) => void;
@@ -164,11 +165,11 @@ export default function VoiceInput({ onResult }: VoiceInputProps) {
                 title={isRecording ? 'Detener grabación' : 'Hablar'}
             >
                 {isProcessing ? (
-                    <span className="processing-icon">⏳</span>
+                    <Loader2 size={20} className="spin" />
                 ) : isRecording ? (
-                    <span className="recording-icon">🔴</span>
+                    <MicOff size={20} />
                 ) : (
-                    <span className="mic-icon">🎤</span>
+                    <Mic size={20} />
                 )}
             </button>
 

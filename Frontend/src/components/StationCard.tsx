@@ -3,6 +3,8 @@
  * Detailed station information card
  */
 
+import { X, MapPin, Zap, Battery, Plug, Clock, Timer, Coffee, Wifi, Store, Utensils, ParkingSquare, Sofa, Target, Navigation, Check } from 'lucide-react';
+
 interface Charger {
     id: string;
     type: 'fast' | 'slow';
@@ -55,25 +57,26 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
         }
     };
 
-    const getConnectorIcon = (connector: string) => {
-        switch (connector) {
-            case 'CCS2': return '🔌';
-            case 'Type2': return '🔋';
-            case 'CHAdeMO': return '⚡';
-            default: return '🔌';
-        }
+    const getAmenityIcon = (amenity: string) => {
+        if (amenity.includes('café')) return <Coffee size={14} />;
+        if (amenity.includes('WiFi')) return <Wifi size={14} />;
+        if (amenity.includes('tienda')) return <Store size={14} />;
+        if (amenity.includes('restaurante')) return <Utensils size={14} />;
+        if (amenity.includes('estacionamiento')) return <ParkingSquare size={14} />;
+        if (amenity.includes('lounge')) return <Sofa size={14} />;
+        return <Check size={14} />;
     };
 
     return (
         <div className="station-card-overlay" onClick={onClose}>
             <div className="station-card" onClick={(e) => e.stopPropagation()}>
-                <button className="close-btn" onClick={onClose}>✕</button>
+                <button className="close-btn" onClick={onClose}><X size={16} /></button>
 
                 <div className="card-header">
                     <h2>{station.name}</h2>
                     <p className="address">{station.address}</p>
                     {station.distance !== undefined && (
-                        <p className="distance">📍 {station.distance} km {station.eta_minutes && `• ${station.eta_minutes} min`}</p>
+                        <p className="distance"><MapPin size={14} /> {station.distance} km {station.eta_minutes && `• ${station.eta_minutes} min`}</p>
                     )}
                 </div>
 
@@ -101,11 +104,11 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                                 className={`charger-item ${charger.status}`}
                             >
                                 <div className="charger-icon">
-                                    {getConnectorIcon(charger.connector)}
+                                    <Plug size={24} />
                                 </div>
                                 <div className="charger-info">
                                     <span className="charger-type">
-                                        {charger.type === 'fast' ? '⚡ Rápido' : '🔋 Lento'}
+                                        {charger.type === 'fast' ? <><Zap size={14} /> Rápido</> : <><Battery size={14} /> Lento</>}
                                     </span>
                                     <span className="charger-power">{charger.power} kW</span>
                                     <span className="charger-connector">{charger.connector}</span>
@@ -125,12 +128,12 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                     <h3>Información de uso</h3>
                     <div className="usage-grid">
                         <div className="usage-item">
-                            <span className="usage-icon">⏱️</span>
+                            <span className="usage-icon"><Timer size={18} /></span>
                             <span className="usage-label">Tiempo promedio de espera</span>
                             <span className="usage-value">{station.usage_factors.avg_wait_time} min</span>
                         </div>
                         <div className="usage-item">
-                            <span className="usage-icon">🕐</span>
+                            <span className="usage-icon"><Clock size={18} /></span>
                             <span className="usage-label">Horarios pico</span>
                             <span className="usage-value">{station.usage_factors.peak_hours.join(', ')}</span>
                         </div>
@@ -142,15 +145,7 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                     <div className="amenities-list">
                         {station.usage_factors.nearby_amenities.map((amenity, index) => (
                             <span key={index} className="amenity-badge">
-                                {amenity === 'café' && '☕'}
-                                {amenity === 'baños' && '🚻'}
-                                {amenity === 'WiFi' && '📶'}
-                                {amenity === 'tienda' && '🏪'}
-                                {amenity === 'restaurante' && '🍽️'}
-                                {amenity === 'estacionamiento' && '🅿️'}
-                                {amenity === 'lounge' && '🛋️'}
-                                {!['café', 'baños', 'WiFi', 'tienda', 'restaurante', 'estacionamiento', 'lounge'].some(a => amenity.includes(a)) && '✓'}
-                                {' '}{amenity}
+                                {getAmenityIcon(amenity)} {amenity}
                             </span>
                         ))}
                     </div>
@@ -161,7 +156,7 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                         className="action-btn primary"
                         onClick={onRecommend}
                     >
-                        🎯 Recomendar para mí
+                        <Target size={16} /> Recomendar para mí
                     </button>
                     <a
                         href={`https://maps.google.com/?daddr=${station.location.lat},${station.location.lng}`}
@@ -169,7 +164,7 @@ export default function StationCard({ station, onClose, onRecommend }: StationCa
                         rel="noopener noreferrer"
                         className="action-btn secondary"
                     >
-                        🧭 Navegar
+                        <Navigation size={16} /> Navegar
                     </a>
                 </div>
             </div>
