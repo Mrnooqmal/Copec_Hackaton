@@ -73,6 +73,7 @@ a svg {
 .station-map-container {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   height: 100vh;
   position: relative;
 }
@@ -82,8 +83,8 @@ a svg {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background: var(--copec-white);
+  padding: 14px 24px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 252, 0.95));
   border-bottom: 3px solid var(--copec-red);
   box-shadow: var(--shadow-md);
   z-index: 1000;
@@ -140,7 +141,7 @@ a svg {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 12px 20px;
+  padding: 12px 24px;
   background: var(--copec-white);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   overflow-x: auto;
@@ -199,7 +200,10 @@ a svg {
 }
 
 .urgency-btn {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
   border: 1px solid var(--copec-light-gray);
   background: var(--copec-white);
   border-radius: var(--radius-md);
@@ -219,7 +223,10 @@ a svg {
 }
 
 .recommend-btn {
-  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
   background: linear-gradient(135deg, var(--copec-primary), var(--copec-secondary));
   color: var(--copec-white);
   border: none;
@@ -244,6 +251,17 @@ a svg {
 .map-wrapper {
   flex: 1;
   position: relative;
+  min-height: calc(100vh - 190px);
+  padding: 16px;
+}
+
+.map-surface {
+  height: 100%;
+  background: var(--copec-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
 .location-button {
@@ -254,9 +272,8 @@ a svg {
   width: 40px;
   height: 40px;
   background: var(--copec-white);
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: var(--radius-md);
-  font-size: 20px;
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: all 0.2s;
@@ -264,6 +281,7 @@ a svg {
 
 .location-button:hover {
   background: var(--copec-primary);
+  color: var(--copec-white);
 }
 
 /* Custom Markers */
@@ -272,14 +290,212 @@ a svg {
   border: none;
 }
 
+
+.copec-marker {
+  position: relative;
+  width: 48px;
+  height: 64px;
+  transform: translate(-50%, -100%);
+}
+
+.copec-marker .marker-body {
+  position: relative;
+  width: 48px;
+  height: 54px;
+  background: var(--copec-white);
+  border-radius: 22px 22px 20px 20px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copec-marker .marker-body::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--copec-white);
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: var(--shadow-sm);
+}
+
+.copec-marker .marker-image {
+  width: 32px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.marker-dot {
+  position: absolute;
+  bottom: -2px;
+  right: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--copec-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.marker-dot.available {
+  background: var(--status-available);
+}
+
+.marker-dot.partial {
+  background: var(--copec-primary);
+}
+
+.marker-dot.occupied {
+  background: var(--status-occupied);
+}
+
+/* Floating action buttons */
+.fab-stack {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 2500;
+}
+
+.fab,
+.chat-fab {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--copec-primary), var(--copec-secondary));
+  color: var(--copec-white);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fab.secondary {
+  background: linear-gradient(135deg, var(--copec-secondary), var(--copec-primary));
+}
+
+.fab:hover,
+.chat-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.chat-panel {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  width: 320px;
+  max-height: 60vh;
+  background: var(--copec-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 2500;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, var(--copec-primary), var(--copec-secondary));
+  color: var(--copec-white);
+  font-weight: 600;
+}
+
+.chat-header button {
+  background: transparent;
+  border: none;
+  color: var(--copec-white);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-body {
+  padding: 14px;
+  background: #f7f9fc;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-placeholder {
+  color: var(--copec-gray);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.chat-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--copec-white);
+}
+
+.chat-footer input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.chat-footer button {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: var(--copec-primary);
+  color: var(--copec-white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.chat-footer input:disabled,
+.chat-footer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .user-marker-container {
   background: transparent;
   border: none;
 }
 
 .user-marker {
-  font-size: 24px;
-  animation: bounce 1s infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--copec-white);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
 }
 
 @keyframes bounce {
@@ -315,6 +531,7 @@ a svg {
   box-shadow: var(--shadow-md);
   display: flex;
   gap: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .legend-item {
@@ -352,7 +569,7 @@ a svg {
   justify-content: center;
   z-index: 2000;
   padding: 20px;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(3px);
 }
 
 .station-card {
@@ -365,6 +582,7 @@ a svg {
   position: relative;
   box-shadow: var(--shadow-xl);
   animation: slideUp 0.3s ease-out;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 @keyframes slideUp {
@@ -386,9 +604,8 @@ a svg {
   width: 32px;
   height: 32px;
   background: var(--copec-light-gray);
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 50%;
-  font-size: 16px;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -418,13 +635,17 @@ a svg {
   color: var(--copec-primary);
   font-weight: 600;
   margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .availability-summary {
-  display: flex;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
   padding: 16px 24px;
-  background: var(--copec-light-gray);
+  background: linear-gradient(135deg, #f5f7fa, #ffffff);
 }
 
 .summary-item {
@@ -512,6 +733,9 @@ a svg {
 .charger-type {
   font-weight: 600;
   font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .charger-power {
@@ -570,6 +794,9 @@ a svg {
   background: var(--copec-light-gray);
   border-radius: var(--radius-xl);
   font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .card-actions {
@@ -589,6 +816,10 @@ a svg {
   text-decoration: none;
   text-align: center;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .action-btn.primary {
@@ -640,6 +871,12 @@ a svg {
   padding: 20px;
   background: linear-gradient(135deg, var(--copec-primary), var(--copec-secondary));
   color: var(--copec-white);
+}
+
+.panel-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .panel-header h2 {
@@ -721,6 +958,9 @@ a svg {
   background: var(--copec-white);
   padding: 4px 8px;
   border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .rec-amenities {
@@ -749,6 +989,10 @@ a svg {
   border-radius: var(--radius-md);
   font-weight: 600;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .navigate-btn:hover {
@@ -766,26 +1010,26 @@ a svg {
 .voice-btn {
   width: 44px;
   height: 44px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: var(--copec-white);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 50%;
-  font-size: 20px;
   cursor: pointer;
   transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--copec-primary);
 }
 
 .voice-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.05);
+  background: var(--copec-light-gray);
+  transform: translateY(-1px);
 }
 
 .voice-btn.recording {
-  background: var(--status-occupied);
-  border-color: var(--status-occupied);
-  animation: pulse-record 1s infinite;
+  background: var(--copec-red);
+  border-color: var(--copec-red);
+  color: var(--copec-white);
 }
 
 @keyframes pulse-record {
@@ -806,10 +1050,12 @@ a svg {
 }
 
 .voice-feedback {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--copec-white);
   padding: 8px 16px;
   border-radius: var(--radius-lg);
-  max-width: 220px;
+  max-width: 240px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .recording-indicator {
