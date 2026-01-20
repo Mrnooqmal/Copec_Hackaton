@@ -234,6 +234,15 @@ export default function StationMap() {
 
     return (
         <div className="station-map-container">
+            {/* SVG filter to desaturate tiles but keep greens more visible */}
+            <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true" focusable="false">
+                <filter id="desaturate-keep-green">
+                    <feColorMatrix
+                        type="matrix"
+                        values="0.33 0.33 0.33 0 0  0.2 0.7 0.2 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"
+                    />
+                </filter>
+            </svg>
             {/* Header */}
             <header className="map-header">
                 <div className="logo-section">

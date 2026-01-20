@@ -139,9 +139,10 @@ a svg {
 /* Controls */
 .map-controls {
   display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 12px 24px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 24px;
   background: var(--copec-white);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   overflow-x: auto;
@@ -151,6 +152,7 @@ a svg {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 220px;
 }
 
 .control-group label {
@@ -168,11 +170,11 @@ a svg {
 }
 
 .battery-control input[type="range"] {
-  width: 120px;
-  height: 6px;
+  width: 160px;
+  height: 8px;
   appearance: none;
   -webkit-appearance: none;
-  background: linear-gradient(to right, var(--status-occupied), var(--status-maintenance), var(--status-available));
+  background: linear-gradient(90deg, #dbeafe 0%, var(--copec-primary) 100%);
   border-radius: 3px;
   outline: none;
 }
@@ -203,7 +205,7 @@ a svg {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 12px;
+  padding: 9px 14px;
   border: 1px solid var(--copec-light-gray);
   background: var(--copec-white);
   border-radius: var(--radius-md);
@@ -262,6 +264,11 @@ a svg {
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(0, 0, 0, 0.06);
   overflow: hidden;
+}
+
+/* Desaturate map tiles while keeping greens slightly vivid */
+.leaflet-tile {
+  filter: url(#desaturate-keep-green);
 }
 
 .location-button {
@@ -406,7 +413,7 @@ a svg {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 2500;
+  z-index: 2600;
 }
 
 .chat-header {
@@ -1468,7 +1475,7 @@ a svg {
   position: fixed;
   right: 20px;
   bottom: 20px;
-  z-index: 2000;
+  z-index: 2600;
 }
 
 .ai-chat {
@@ -1710,4 +1717,344 @@ a svg {
   .trip-planner {
     max-width: calc(100vw - 40px);
   }
+}
+
+/* ========================================
+   ENHANCED TRIP PLANNER GPS SEARCH
+   ======================================== */
+
+/* Use location button */
+.use-location-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--copec-primary), var(--copec-secondary));
+  color: var(--copec-white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.use-location-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Search wrapper */
+.search-wrapper {
+  position: relative;
+}
+
+.search-wrapper input {
+  width: 100%;
+  padding: 12px 40px 12px 14px;
+  border: 2px solid var(--copec-light-gray);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.search-wrapper input:focus {
+  outline: none;
+  border-color: var(--copec-primary);
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--copec-gray);
+}
+
+/* Search results dropdown */
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--copec-white);
+  border: 1px solid var(--copec-light-gray);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 200;
+  margin-top: 4px;
+}
+
+.search-result {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--copec-light-gray);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.search-result:last-child {
+  border-bottom: none;
+}
+
+.search-result:hover {
+  background: var(--copec-light-gray);
+}
+
+.search-result div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.search-result strong {
+  font-size: 0.9rem;
+  color: var(--copec-dark);
+}
+
+.search-result small {
+  font-size: 0.75rem;
+  color: var(--copec-gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Selected location chip */
+.selected-location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(20, 108, 253, 0.15), rgba(52, 66, 133, 0.1));
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+  border-left: 3px solid var(--copec-primary);
+}
+
+.selected-location.destination {
+  border-left-color: var(--status-available);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+}
+
+.selected-location span {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.selected-location button {
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Vehicle section */
+.vehicle-section {
+  padding: 16px;
+  background: var(--copec-light-gray);
+  border-radius: var(--radius-md);
+}
+
+.vehicle-section label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--copec-gray);
+  margin-bottom: 10px;
+}
+
+.vehicle-section select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  background: var(--copec-white);
+}
+
+.custom-range {
+  margin-top: 12px;
+}
+
+.custom-range label {
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+
+.range-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.range-input input {
+  width: 100px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+/* Battery section */
+.battery-section {
+  padding: 16px;
+  background: var(--copec-light-gray);
+  border-radius: var(--radius-md);
+}
+
+.battery-section>label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--copec-gray);
+  margin-bottom: 10px;
+}
+
+.battery-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.battery-slider input[type="range"] {
+  flex: 1;
+  height: 8px;
+  -webkit-appearance: none;
+  background: linear-gradient(to right, var(--status-occupied), var(--copec-primary), var(--status-available));
+  border-radius: 4px;
+}
+
+.battery-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--copec-primary);
+  min-width: 50px;
+  text-align: right;
+}
+
+.range-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(34, 197, 94, 0.15);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--copec-dark);
+}
+
+.range-info strong {
+  color: var(--status-available);
+}
+
+.range-explanation {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--copec-gray);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* Preferences section */
+.preferences-section {
+  margin-top: 4px;
+}
+
+.preferences-section>label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--copec-gray);
+  margin-bottom: 10px;
+}
+
+.preference-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pref-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px;
+  background: var(--copec-white);
+  border: 2px solid var(--copec-light-gray);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.pref-option input[type="checkbox"] {
+  display: none;
+}
+
+.pref-option:hover {
+  border-color: var(--copec-primary);
+}
+
+.pref-option.active {
+  background: linear-gradient(135deg, var(--copec-primary), var(--copec-secondary));
+  color: var(--copec-white);
+  border-color: transparent;
+}
+
+.pref-option span {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.pref-option small {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+/* Route stats charging highlight */
+.route-stats .stat.charging {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+  color: var(--status-available);
+  font-weight: 600;
+}
+
+/* Stop amenities */
+.stop-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.stop-amenities .amenity {
+  padding: 4px 10px;
+  background: var(--copec-white);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--copec-secondary);
 }
