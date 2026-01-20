@@ -47,10 +47,43 @@ interface TripPlannerProps {
     onShowRoute?: (trip: TripPlan) => void;
 }
 
-// Nominatim API for real GPS address search (free, OpenStreetMap)
-const searchAddress = async (query: string): Promise<Location[]> => {
-    if (query.length < 3) return [];
+// Common Chilean destinations for instant results
+const CHILEAN_CITIES: Location[] = [
+    { lat: -33.0153, lng: -71.5503, name: 'Viña del Mar', address: 'Viña del Mar, Valparaíso, Chile' },
+    { lat: -33.0458, lng: -71.6197, name: 'Valparaíso', address: 'Valparaíso, Región de Valparaíso, Chile' },
+    { lat: -34.1708, lng: -70.7444, name: 'Rancagua', address: 'Rancagua, Región de O\'Higgins, Chile' },
+    { lat: -33.5927, lng: -71.6214, name: 'San Antonio', address: 'San Antonio, Región de Valparaíso, Chile' },
+    { lat: -32.9181, lng: -71.5094, name: 'Concón', address: 'Concón, Región de Valparaíso, Chile' },
+    { lat: -33.4022, lng: -70.5665, name: 'Las Condes', address: 'Las Condes, Santiago, Chile' },
+    { lat: -33.4103, lng: -70.5663, name: 'Providencia', address: 'Providencia, Santiago, Chile' },
+    { lat: -33.4167, lng: -70.6000, name: 'Ñuñoa', address: 'Ñuñoa, Santiago, Chile' },
+    { lat: -33.4500, lng: -70.6667, name: 'Santiago Centro', address: 'Santiago, Región Metropolitana, Chile' },
+    { lat: -33.0245, lng: -71.5518, name: 'Reñaca', address: 'Reñaca, Viña del Mar, Chile' },
+    { lat: -36.8201, lng: -73.0440, name: 'Concepción', address: 'Concepción, Región del Biobío, Chile' },
+    { lat: -39.8142, lng: -73.2459, name: 'Valdivia', address: 'Valdivia, Región de Los Ríos, Chile' },
+    { lat: -41.4693, lng: -72.9424, name: 'Puerto Montt', address: 'Puerto Montt, Región de Los Lagos, Chile' },
+    { lat: -29.9027, lng: -71.2519, name: 'La Serena', address: 'La Serena, Región de Coquimbo, Chile' },
+    { lat: -23.6509, lng: -70.3975, name: 'Antofagasta', address: 'Antofagasta, Región de Antofagasta, Chile' },
+];
 
+// Search with local fallback + API
+const searchAddress = async (query: string): Promise<Location[]> => {
+    if (query.length < 2) return [];
+
+    const queryLower = query.toLowerCase();
+
+    // First, filter local cities that match
+    const localResults = CHILEAN_CITIES.filter(city =>
+        city.name.toLowerCase().includes(queryLower) ||
+        city.address?.toLowerCase().includes(queryLower)
+    );
+
+    // If we have local results, return them immediately
+    if (localResults.length > 0) {
+        return localResults.slice(0, 5);
+    }
+
+    // Otherwise try Nominatim API
     try {
         const response = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Chile&countrycodes=cl&limit=5`,
@@ -62,18 +95,20 @@ const searchAddress = async (query: string): Promise<Location[]> => {
             }
         );
 
-        if (!response.ok) return [];
+        if (!response.ok) return localResults;
 
         const data = await response.json();
-        return data.map((item: any) => ({
+        const apiResults = data.map((item: any) => ({
             lat: parseFloat(item.lat),
             lng: parseFloat(item.lon),
             name: item.display_name.split(',')[0],
             address: item.display_name
         }));
+
+        return apiResults.length > 0 ? apiResults : localResults;
     } catch (error) {
         console.error('Address search error:', error);
-        return [];
+        return localResults;
     }
 };
 
